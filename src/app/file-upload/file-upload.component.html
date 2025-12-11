@@ -1,0 +1,84 @@
+<div class="upload-container">
+  <div class="upload-card">
+    <div
+      class="drop-zone"
+      [class.dragging]="isDragging"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)">
+
+      <div class="drop-zone-content">
+        <div class="upload-icon">📤</div>
+        <h2>Drop files here or click to browse</h2>
+        <p>Upload files to Azure Storage Account</p>
+        <input
+          type="file"
+          id="fileInput"
+          multiple
+          (change)="onFileSelected($event)"
+          class="file-input">
+        <label for="fileInput" class="browse-button">
+          Choose Files
+        </label>
+      </div>
+    </div>
+
+    <div class="selected-files" *ngIf="selectedFiles.length > 0">
+      <div class="section-header">
+        <h3>Selected Files ({{ selectedFiles.length }})</h3>
+        <button class="clear-button" (click)="clearAll()">Clear All</button>
+      </div>
+
+      <div class="file-list">
+        <div class="file-item" *ngFor="let file of selectedFiles; let i = index">
+          <div class="file-info">
+            <span class="file-icon">{{ getFileIcon(file) }}</span>
+            <div class="file-details">
+              <div class="file-name">{{ file.name }}</div>
+              <div class="file-size">{{ formatFileSize(file.size) }}</div>
+            </div>
+          </div>
+          <button class="remove-button" (click)="removeFile(i)" [disabled]="isUploading">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <button
+        class="upload-button"
+        (click)="uploadFiles()"
+        [disabled]="isUploading">
+        {{ isUploading ? 'Uploading...' : 'Upload Files' }}
+      </button>
+    </div>
+
+    <div class="upload-progress" *ngIf="uploadProgress.length > 0">
+      <h3>Upload Progress</h3>
+      <div class="progress-list">
+        <div class="progress-item" *ngFor="let progress of uploadProgress">
+          <div class="progress-info">
+            <span class="progress-icon">
+              <span *ngIf="progress.status === 'completed'">✅</span>
+              <span *ngIf="progress.status === 'error'">❌</span>
+              <span *ngIf="progress.status === 'uploading'">⏳</span>
+            </span>
+            <div class="progress-details">
+              <div class="progress-file-name">{{ progress.fileName }}</div>
+              <div class="progress-status" [class]="progress.status">
+                <span *ngIf="progress.status === 'completed'">Completed</span>
+                <span *ngIf="progress.status === 'error'">{{ progress.error }}</span>
+                <span *ngIf="progress.status === 'uploading'">{{ progress.progress }}%</span>
+              </div>
+            </div>
+          </div>
+          <div class="progress-bar" *ngIf="progress.status === 'uploading'">
+            <div class="progress-bar-fill" [style.width.%]="progress.progress"></div>
+          </div>
+          <div class="file-url" *ngIf="progress.url">
+            <a [href]="progress.url" target="_blank">View File</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
